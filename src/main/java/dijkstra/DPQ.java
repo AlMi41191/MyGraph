@@ -21,6 +21,8 @@ public class DPQ {
     public void dijkstra(List<List<Node>> adj, int src) {
         this.list = adj;
 
+        print();
+
         for (int i = 0; i < V; i++) {
             dist[i] = Integer.MAX_VALUE;
         }
@@ -32,13 +34,13 @@ public class DPQ {
         dist[src] = 0;
         while (set.size() != V) {
             //when the priority queue is empty, return
-            if(priorityQueue.isEmpty()) {
+            if (priorityQueue.isEmpty()) {
                 return;
             }
 
             // remove the minimum distance node
             // from the priority queue
-            int u = priorityQueue.remove().node;
+            int u = priorityQueue.remove().value;
 
             // adding the node whose distance is
             // finalized
@@ -56,20 +58,20 @@ public class DPQ {
 
         // All the neighbors of v
         for (int i = 0; i < list.get(u).size(); i++) {
-            Node v = list.get(u).get(i);
+            Node node = list.get(u).get(i);
 
             // If current node hasn't already been processed
-            if (!set.contains(v.node)) {
-                edgeDistance = v.cost;
+            if (!set.contains(node.value)) {
+                edgeDistance = node.cost;
                 newDistance = dist[u] + edgeDistance;
 
                 // If new distance is cheaper in cost
-                if (newDistance < dist[v.node]) {
-                    dist[v.node] = newDistance;
+                if (newDistance < dist[node.value]) {
+                    dist[node.value] = newDistance;
                 }
 
                 // Add the current node to the queue
-                priorityQueue.add(new Node(v.node, dist[v.node]));
+                priorityQueue.add(new Node(node.value, dist[node.value]));
             }
         }
     }
@@ -109,22 +111,36 @@ public class DPQ {
             System.out.println(source + " to " + i + " is " + dpq.dist[i]);
         }
     }
+
+    private void print() {
+        for (List<Node> nodes : list) {
+            System.out.println(nodes);
+        }
+    }
 }
 
 // Class to represent a node in the graph
 class Node implements Comparator<Node> {
-    public int node;
+    public int value;
     public int cost;
 
     public Node() {}
 
-    public Node(int node, int cost) {
-        this.node = node;
+    public Node(int value, int cost) {
+        this.value = value;
         this.cost = cost;
     }
 
     @Override
     public int compare(Node node1, Node node2) {
         return Integer.compare(node1.cost, node2.cost);
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "node=" + value +
+                ", cost=" + cost +
+                '}';
     }
 }
