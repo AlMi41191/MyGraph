@@ -2,23 +2,31 @@ package graph;
 
 public class Solution {
     public static void main(String[] args) {
-        Graph graph = new Graph();
-        graph.addVertex('A'); //0
-        graph.addVertex('B'); //1
-        graph.addVertex('C'); //2
-        graph.addVertex('D'); //3
-        graph.addVertex('E'); //4
-        graph.addVertex('F'); //5
-        graph.addVertex('G'); //6
+        Vertex A = Vertex.createVertex('A', 0, 0);
+        Vertex B = Vertex.createVertex('B', 0, 4);
+        Vertex C = Vertex.createVertex('C', 4, 0);
+        Vertex D = Vertex.createVertex('D', 4, 4);
+        Vertex E = Vertex.createVertex('E', 2, 2);
 
-        graph.addEdge(0,1);
-        graph.addEdge(0,2);
-        graph.addEdge(0,3);
-        graph.addEdge(1,4);
-        graph.addEdge(3,5);
-        graph.addEdge(5,6);
+        Graph graph = new Graph(5);
+
+        graph.addVertex(A);
+        graph.addVertex(B);
+        graph.addVertex(D);
+        graph.addVertex(C);
+        graph.addVertex(E);
+
+        graph.addEdge(A, B);
+        graph.addEdge(B, D);
+        graph.addEdge(B, A);
+        graph.addEdge(D, C);
+        graph.addEdge(C, A);
 
         System.out.println("Visits: ");
-        graph.dfs();
+
+        graph.dfs(A);
+        
+        graph.printEdgeInt();
+        graph.printEdgeMap();
     }
 }

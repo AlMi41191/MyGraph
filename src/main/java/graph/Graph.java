@@ -1,68 +1,106 @@
 package graph;
 
-import java.util.Stack;
+import java.util.*;
 
 public class Graph {
-    private final int MAX_VERTS = 10;
-    private Vertex vertexArray[]; //массив вершин
-    private int adjMat[][]; // матрица смежности
-    private int nVerts; // текущее количество вершин
-    private Stack<Integer> stack;
+    private final static Set<Vertex> HASH = new LinkedHashSet<>();
 
-    public Graph() { // инициализация внутрених полей
-        vertexArray = new Vertex[MAX_VERTS];
-        adjMat = new int[MAX_VERTS][MAX_VERTS];
-        nVerts = 0;
-        for (int j = 0; j < MAX_VERTS; j++) {
-            for (int k = 0; k < MAX_VERTS; k++) {
-                adjMat[j][k] = 0;
+    private final List<Vertex> vertexList;
+    private final Map<Vertex, Set<Vertex>> adjVerticesMap;
+    private final int[][] adjVertices;
+
+    // Конструктор
+    public Graph(int size) {
+        this.adjVerticesMap = new HashMap<>();
+        this.adjVertices = new int[size][size];
+        this.vertexList = new ArrayList<>();
+    }
+
+    // Добавление вершины
+    public void addVertex(Vertex vertex) {
+        if (!HASH.contains(vertex)) {
+            HASH.add(vertex);
+            vertexList.add(vertex);
+            adjVerticesMap.putIfAbsent(vertex, new HashSet<>());
+        }
+    }
+
+    // Добавление ребра
+    public void addEdge(Vertex start, Vertex end) {
+        addVertex(start);
+        addVertex(end);
+
+        int row = findNum(start);
+        int col = findNum(end);
+
+        adjVertices[row][col] = 1;
+        adjVertices[col][row] = 1;
+
+        adjVerticesMap.get(start).add(end);
+        adjVerticesMap.get(end).add(start);
+    }
+
+    private int findNum(Vertex vertex) {
+        for (int i = 0; i < vertexList.size(); i++) {
+            if (vertexList.get(i).equals(vertex)) {
+                return i;
             }
         }
-        stack = new Stack<>();
+        return 0;
     }
 
-    public void addVertex(char lab) {
-        vertexArray[nVerts++] = new Vertex(lab);
-    }
+    public void dfs(Vertex start) {
+        Queue<Vertex> stack = new PriorityQueue<>();
 
-    public void addEdge(int start, int end) {
-        adjMat[start][end] = 1;
-        adjMat[end][start] = 1;
-    }
+        start.setVisited(true);
+        stack.offer(start);
 
-    public void displayVertex(int v) {
-        System.out.println(vertexArray[v].getLabel());
-    }
+        while (!stack.isEmpty()) {
+            Vertex current = stack.poll();
+            printVertex(current);
 
-    public void dfs() { // обход в глубину
-        vertexArray[0].setWasVisited(true); // берётся первая вершина
-        displayVertex(0);
-        stack.push(0);
-
-        while (!stack.empty()) {
-            int v = getAdjUnvisitedVertex(stack.peek()); // вынуть индекс смежной веришины, еckи есть 1, нету -1
-            if (v == -1) { // если непройденных смежных вершин нету
-                stack.pop(); // элемент извлекается из стека
-            }
-            else {
-                vertexArray[v].setWasVisited(true);
-                displayVertex(v);
-                stack.push(v); // элемент попадает на вершину стека
+            for (Vertex vertex : adjVerticesMap.get(current)) {
+                if (!vertex.isVisited()) {
+                    vertex.setVisited(true);
+                    stack.offer(vertex);
+                }
             }
         }
 
-        for (int j = 0; j < nVerts; j++) {  // сброс флагов
-            vertexArray[j].wasVisited = false;
-        }
-
+        reset();
     }
 
-    private int getAdjUnvisitedVertex(int v) {
-        for (int j = 0; j < nVerts; j++) {
-            if (adjMat[v][j] == 1 && vertexArray[j].wasVisited == false) {
-                return j; //возвращает первую найденную вершину
-            }
+    public void printVertex(Vertex vertex) {
+        System.out.println(vertex);
+    }
+
+    private void reset() {
+        for (Vertex vertex : HASH) {
+            vertex.setVisited(false);
         }
-        return -1;
+    }
+
+    public void printEdgeMap() {
+        for (Vertex vertex : adjVerticesMap.keySet()) {
+            System.out.print(vertex.getName() + ": ");
+            for (Vertex neighbor : adjVerticesMap.get(vertex)) {
+                System.out.print(neighbor.getName() + ", ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void printEdgeInt() {
+        for (int i = 0; i < vertexList.size(); i++) {
+            System.out.println(i + ": " + vertexList.get(i));
+        }
+
+        for (int[] array : adjVertices) {
+            for (int value : array) {
+                System.out.print(value + " ");
+            }
+            System.out.println();
+        }
     }
 }
+
