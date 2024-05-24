@@ -35,7 +35,7 @@ public class Vertex implements Comparable<Vertex> {
 
     
     public double distanceTo(Vertex vertex) {
-        return Math.sqrt(Math.pow(this.row - vertex.row, 2) + Math.pow(this.col - vertex.col, 2));
+        return Math.sqrt(Math.pow(vertex.row - this.row, 2) + Math.pow(vertex.col - this.col, 2));
     }
     
     public int getRow() {
