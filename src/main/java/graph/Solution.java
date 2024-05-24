@@ -8,7 +8,7 @@ public class Solution {
         Vertex B = Vertex.createVertex('B', 0, SIZE - 1);
         Vertex C = Vertex.createVertex('C', SIZE - 1, 0);
         Vertex D = Vertex.createVertex('D', SIZE - 1, SIZE - 1);
-        Vertex E = Vertex.createVertex('E', SIZE/2, SIZE/2);
+        Vertex E = Vertex.createVertex('E', SIZE / 2, SIZE / 2);
         
         Graph graph = new Graph(SIZE);
         
