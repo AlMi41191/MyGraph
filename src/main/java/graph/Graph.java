@@ -16,7 +16,7 @@ public class Graph {
     public Graph(int size) {
         this.size = size;
         this.adjMap = new HashMap<>();
-        this.listVertex = new ArrayList();
+        this.listVertex = new ArrayList<>();
         this.adjMatrix = new Vertex[size][size];
         this.listEdge = new ArrayList<>();
     }
@@ -77,7 +77,7 @@ public class Graph {
     }
     
     public void dfsMap(Vertex start) {
-        Stack<Vertex> stack = new Stack();
+        Stack<Vertex> stack = new Stack<>();
         
         start.setVisited(true);
         stack.push(start);
@@ -99,7 +99,7 @@ public class Graph {
     }
     
     public void dfsInt(Vertex start) {
-        Stack<Vertex> stack = new Stack();
+        Stack<Vertex> stack = new Stack<>();
         
         start.setVisited(true);
         stack.push(start);
