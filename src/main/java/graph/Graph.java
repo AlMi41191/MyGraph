@@ -61,6 +61,7 @@ public class Graph {
     }
 
     public void dfsMap(Vertex start) {
+        System.out.println("-----dfsMap-----");
         Stack<Vertex> stack = new Stack<>();
 
         start.setVisited(true);
@@ -82,6 +83,8 @@ public class Graph {
     }
 
     public void dfsInt(Vertex start) {
+        System.out.println("-----dfsInt-----");
+
         Stack<Vertex> stack = new Stack<>();
 
         start.setVisited(true);
@@ -102,18 +105,40 @@ public class Graph {
         reset();
     }
 
+    public void bfsInt(Vertex start) {
+        System.out.println("-----bfsInt-----");
+        Queue<Vertex> queue = new PriorityQueue<>();
+
+        start.setVisited(true);
+        queue.add(start);
+
+        while (!queue.isEmpty()) {
+            Vertex current = queue.poll();
+            printVertex(current);
+
+            for (Vertex neighbor : adjMatrix[findNumber(current)]) {
+                if (neighbor != null && !neighbor.isVisited()) {
+                    neighbor.setVisited(true);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        reset();
+    }
+
     private void reset() {
         for (Vertex vertex : VERTEX_HASH) {
             vertex.setVisited(false);
         }
     }
 
-    public String printVertex(Vertex vertex) {
-        return vertex.toString();
+    public void printVertex(Vertex vertex) {
+        System.out.println(vertex);
     }
 
-    public String printAdjMap() {
-        StringBuilder builder = new StringBuilder("AdjMap\n");
+    public void printAdjMap() {
+        StringBuilder builder = new StringBuilder("-----AdjMap-----\n");
         for (Vertex vertex : VERTEX_HASH) {
             builder.append(vertex.getName()).append(": ");
             for (Vertex neighbor : adjMap.get(vertex)) {
@@ -121,11 +146,11 @@ public class Graph {
             }
             builder.append("\n");
         }
-        return builder.toString();
+        System.out.println(builder);
     }
 
-    public String printAdjMatrix() {
-        StringBuilder builder = new StringBuilder("AdjMatrix\n");
+    public void printAdjMatrix() {
+        StringBuilder builder = new StringBuilder("-----AdjMatrix-----\n");
         for (int row = 0; row < size; row++) {
             builder.append(listVertex.get(row).getName())
                     .append(": ");
@@ -140,7 +165,8 @@ public class Graph {
             }
             builder.append("\n");
         }
-        return builder.toString();
+
+        System.out.println(builder);
     }
 
     private static class Edge implements Comparable<Edge> {

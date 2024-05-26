@@ -25,8 +25,10 @@ public class Solution {
         graph.addEdge(A, B);
         graph.addEdge(A, C);
         
-        // graph.dfsMap(A);
+        graph.dfsMap(A);
         graph.dfsInt(A);
+
+        graph.bfsInt(A);
         
         graph.printAdjMap();
         graph.printAdjMatrix();
