@@ -76,12 +76,9 @@ public class Vertex implements Comparable<Vertex> {
     
     @Override
     public int compareTo(Vertex vertex) {
-        /*
         int present = (int) Math.sqrt(Math.pow(this.row, 2) + Math.pow(this.col, 2));
         int other = (int) Math.sqrt(Math.pow(vertex.row, 2) + Math.pow(vertex.col, 2));
         return Integer.compare(present, other);
-        */
-        return (int) Math.round(this.distanceTo(vertex));
     }
     
     @Override
