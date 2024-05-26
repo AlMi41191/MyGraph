@@ -3,50 +3,80 @@ package graph;
 import java.util.*;
 
 public class Graph {
-    private static final Set<Vertex> VERTEX_HASH = new HashSet<>();
+    private final Map<Vertex, Set<Vertex>> adjMap; // матрица смежностей
+    private final Vertex[][] adjMatrix; // матрица смежностей
 
-    private final Map<Vertex, Set<Vertex>> adjMap;
-
-    private final List<Vertex> listVertex;
-    private final Vertex[][] adjMatrix;
-    private final List<Edge> listEdge;
+    private final List<Vertex> listVertex; // список Vertex
+    private final List<Edge> listEdge; // список Edge
 
     private final int size;
 
     public Graph(int size) {
         this.size = size;
+
         this.adjMap = new HashMap<>();
-        this.listVertex = new ArrayList<>();
         this.adjMatrix = new Vertex[size][size];
+
+        this.listVertex = new ArrayList<>();
         this.listEdge = new ArrayList<>();
     }
 
+    // Размер listEdge
+    public int getSizeListEdge() {
+        return listEdge.size();
+    }
+
+    // Размер listVertex
+    public int getSizeListVertex() {
+        return listVertex.size();
+    }
+
+    // Добавляем Vertex в Graph
     public void addVertex(Vertex vertex) {
-        if (!VERTEX_HASH.contains(vertex)) {
-            VERTEX_HASH.add(vertex);
-            listVertex.add(vertex);
+        if (!listVertex.contains(vertex)) {
+            addToListVertex(vertex);
             adjMap.put(vertex, new HashSet<>());
         }
     }
 
+    // Добавляем Vertex список listVertex и сортируем listVertex
+    private void addToListVertex(Vertex vertex) {
+        listVertex.add(vertex);
+
+        if (listVertex.size() > 1) {
+            Collections.sort(listVertex);
+        }
+    }
+
+    // Создаем Edge из двух Vertex и добавляем их в Graph
     public void addEdge(Vertex start, Vertex end) {
         addVertex(start);
         addVertex(end);
 
-        listEdge.add(new Edge(start, end));
+        addToListEdge(new Edge(start, end));
 
         int row = findNumber(start);
         int col = findNumber(end);
 
-        if (row == -1 || col == -1) throw new RuntimeException("row == -1 || col == -1");
+        if (row != -1 && col != -1) {
+            adjMatrix[row][col] = end; // в start добавляю end (start связываю с end)
+            adjMatrix[col][row] = start; // в end добавляю start (end связываю с start)
+        }
 
-        adjMatrix[row][col] = end;
-        adjMatrix[col][row] = start;
-
-        adjMap.get(start).add(end);
-        adjMap.get(end).add(start);
+        adjMap.get(start).add(end); // в start добавляю end (start связываю с end)
+        adjMap.get(end).add(start); // в end добавляю start (end связываю с start)
     }
 
+    // Добавляем Edge список listEdge и сортируем listEdge
+    private void addToListEdge(Edge edge) {
+        listEdge.add(edge);
+
+        if (listEdge.size() > 1) {
+            Collections.sort(listEdge);
+        }
+    }
+
+    // Ищем номе Vertex в списке listVertex
     private int findNumber(Vertex vertex) {
         for (int i = 0; i < listVertex.size(); i++) {
             if (listVertex.get(i).equals(vertex)) {
@@ -56,12 +86,15 @@ public class Graph {
         return -1;
     }
 
+    // Получаем Edge из списка listEdge
     public Edge getEdge(int cell) {
         return listEdge.get(cell);
     }
 
+    // Поиск Vertex в глубину
     public void dfsMap(Vertex start) {
-        System.out.println("-----dfsMap-----");
+        System.out.println("-----DfsMap-----");
+
         Stack<Vertex> stack = new Stack<>();
 
         start.setVisited(true);
@@ -79,11 +112,13 @@ public class Graph {
             }
         }
 
+        // Сброс флагов после обхода
         reset();
     }
 
+    // Поиск Vertex в глубину
     public void dfsInt(Vertex start) {
-        System.out.println("-----dfsInt-----");
+        System.out.println("-----DfsInt-----");
 
         Stack<Vertex> stack = new Stack<>();
 
@@ -102,11 +137,14 @@ public class Graph {
             }
         }
 
+        // Сброс флагов после обхода
         reset();
     }
 
-    public void bfsInt(Vertex start) {
-        System.out.println("-----bfsInt-----");
+    // Поиск Vertex в ширину
+    public void bfsInt(Vertex start, Vertex end) {
+        System.out.println("-----BfsInt-----");
+
         Queue<Vertex> queue = new PriorityQueue<>();
 
         start.setVisited(true);
@@ -116,56 +154,82 @@ public class Graph {
             Vertex current = queue.poll();
             printVertex(current);
 
+            if (current.equals(end)) {
+                break;
+            }
+
+            int max = Integer.MAX_VALUE;
+            Vertex best = null;
             for (Vertex neighbor : adjMatrix[findNumber(current)]) {
                 if (neighbor != null && !neighbor.isVisited()) {
-                    neighbor.setVisited(true);
-                    queue.add(neighbor);
+
+                    if (neighbor.equals(end)) {
+                        neighbor.setVisited(true);
+                        queue.add(neighbor);
+                        break;
+                    }
+
+                    int path = (int) Math.round(current.distanceTo(neighbor));
+                    if (path < max) {
+                        max = path;
+                        neighbor.setVisited(true);
+                        best = neighbor;
+                    }
                 }
+            }
+            if (best != null) {
+                queue.add(best);
             }
         }
 
+        // Сброс флагов после обхода
         reset();
     }
 
+    // Сброс флагов после обхода
     private void reset() {
-        for (Vertex vertex : VERTEX_HASH) {
+        for (Vertex vertex : listVertex) {
             vertex.setVisited(false);
         }
     }
 
+    // Выводим в консоль Vertex
     public void printVertex(Vertex vertex) {
         System.out.println(vertex);
     }
 
+    // Выводим в консоль матрицу смежностей AdjMap
     public void printAdjMap() {
         StringBuilder builder = new StringBuilder("-----AdjMap-----\n");
-        for (Vertex vertex : VERTEX_HASH) {
-            builder.append(vertex.getName()).append(": ");
+        for (Vertex vertex : listVertex) {
+            builder.append(vertex.getName())
+            .append(": ");
             for (Vertex neighbor : adjMap.get(vertex)) {
-                builder.append(neighbor.getName()).append(" ");
+                builder.append(neighbor.getName())
+                .append(" ");
             }
             builder.append("\n");
         }
         System.out.println(builder);
     }
 
+    // Выводим в консоль матрицу смежностей AdjMatrix
     public void printAdjMatrix() {
         StringBuilder builder = new StringBuilder("-----AdjMatrix-----\n");
         for (int row = 0; row < size; row++) {
             builder.append(listVertex.get(row).getName())
-                    .append(": ");
+            .append(": ");
             for (int col = 0; col < size; col++) {
                 Vertex vertex = adjMatrix[row][col];
                 if (vertex != null) {
                     builder.append(adjMatrix[row][col].getName())
-                            .append(" ");
+                    .append(" ");
                 } else {
                     builder.append(". ");
                 }
             }
             builder.append("\n");
         }
-
         System.out.println(builder);
     }
 
@@ -187,16 +251,16 @@ public class Graph {
 
         @Override
         public int compareTo(Edge other) {
-            return Integer.compare(this.weight, other.weight);
+            return Integer.compare(this.weight(), other.weight());
         }
 
         @Override
         public String toString() {
             return "Edge:" +
-                    " start=" + start.getName() +
-                    " to" +
-                    " end=" + end.getName() +
-                    " weight=" + weight;
+               " start=" + start.getName() +
+               " to" +
+               " end=" + end.getName() +
+               " weight=" + weight;
         }
     }
 }
